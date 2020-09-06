@@ -60,7 +60,7 @@ NON_NULL void __vec_push_back(void *restrict vec,
     }
 }
 
-NON_NULL void *__vec_pos(void *vec, size_t n, size_t type_size)
+NON_NULL void *__vec_pos(void *vec, size_t n, size_t elemsize)
 {
     union {
         STRUCT_BODY(char);
@@ -72,5 +72,5 @@ NON_NULL void *__vec_pos(void *vec, size_t n, size_t type_size)
 
     assert(v->size > n);
 
-    return (void *) ((v->on_heap ? v->ptr : v->buf) + n * type_size);
+    return (void *) ((v->on_heap ? v->ptr : v->buf) + n * elemsize);
 }
