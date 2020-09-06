@@ -1,6 +1,7 @@
 #ifndef _VECTOR_H
 #define _VECTOR_H
 
+#include <assert.h>
 #include <stdlib.h>
 /* vector with small buffer optimization */
 
@@ -36,14 +37,18 @@
 #define vec_data(v) (v.on_heap ? v.ptr : v.buf) /* always contiguous buffer */
 
 #define vec_elemsize(v) sizeof(v.buf[0])
-#define vec_pos(v, n) vec_data(v)[n] /* lvalue */
+
+
+#define vec_pos(v, n) \
+    *(__typeof__(v.buf[0]) *) __vec_pos(&v, n, sizeof(vec_elemsize))
+
 
 #define vec_reserve(v, n) __vec_reserve(&v, n, vec_elemsize(v), vec_capacity(v))
 #define vec_push_back(v, e)                                            \
     __vec_push_back(&v, &(__typeof__(v.buf[0])[]){e}, vec_elemsize(v), \
                     vec_capacity(v))
 
-#define vec_pop_back(v) (void) (v.size -= 1)
+#define vec_pop_back(v) (void) (v.size -= !!v.size)
 
 /* This function attribute specifies function parameters that are not supposed
  * to be null pointers. This enables the compiler to generate a warning on
@@ -73,5 +78,8 @@ NON_NULL void __vec_push_back(void *restrict vec,
                               void *restrict e,
                               size_t elemsize,
                               size_t capacity);
+
+NON_NULL void *__vec_pos(void *vec, size_t n, size_t type_size);
+
 
 #endif

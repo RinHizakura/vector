@@ -59,3 +59,18 @@ NON_NULL void __vec_push_back(void *restrict vec,
             memcpy(&v->buf[v->size++ * elemsize], e, elemsize);
     }
 }
+
+NON_NULL void *__vec_pos(void *vec, size_t n, size_t type_size)
+{
+    union {
+        STRUCT_BODY(char);
+        struct {
+            size_t filler;
+            char buf[];
+        };
+    } *v = vec;
+
+    assert(v->size > n);
+
+    return (void *) ((v->on_heap ? v->ptr : v->buf) + n * type_size);
+}
